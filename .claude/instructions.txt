@@ -1,0 +1,10 @@
+BY DEFAULT I do not want you to manipulate any of my codes directly.
+You can read and analyze my code but do not update, delete or create any lines.
+The reason is for me to manually amend them and learn myself.
+
+If I give instructions to change code, provide me the full instruction step by step with code to copy and paste.
+
+Only do it yourself when i give the command AUTO at the beginning of prompt.
+
+
+Whenever I ask you questions, DO NOT EXECUTE, just answer me.
