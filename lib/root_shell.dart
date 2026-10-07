@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'data/workout_repository.dart';
 import 'models/workout_session.dart';
-import 'screens/add_session_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/logging_choice_screen.dart';
 import 'screens/workouts_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/profile_screen.dart';
@@ -53,7 +53,7 @@ class _RootShellState extends State<RootShell> {
           onPressed: () async {
             final result = await Navigator.push<WorkoutSession>(
               context,
-              MaterialPageRoute(builder: (_) => const AddSessionScreen()),
+              MaterialPageRoute(builder: (_) => const LoggingChoiceScreen()),
             );
             if (result != null) {
               await _addSession(result);
