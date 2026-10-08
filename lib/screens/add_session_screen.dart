@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../models/workout_session.dart';
 
 class AddSessionScreen extends StatefulWidget {
-  const AddSessionScreen({super.key});
+  /// When provided, the screen edits this session instead of creating a new one.
+  final WorkoutSession? initialSession;
+
+  const AddSessionScreen({super.key, this.initialSession});
 
   @override
   State<AddSessionScreen> createState() => _AddSessionScreenState();
@@ -11,8 +14,20 @@ class AddSessionScreen extends StatefulWidget {
 
 class _AddSessionScreenState extends State<AddSessionScreen> {
   WorkoutType? _selectedType;
-  final _setsController = TextEditingController();
-  final _repsController = TextEditingController();
+  late final _setsController = TextEditingController(
+    text: widget.initialSession?.sets.toString(),
+  );
+  late final _repsController = TextEditingController(
+    text: widget.initialSession?.reps.toString(),
+  );
+
+  bool get _isEditing => widget.initialSession != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedType = widget.initialSession?.type;
+  }
 
   @override
   void dispose() {
@@ -33,11 +48,11 @@ class _AddSessionScreenState extends State<AddSessionScreen> {
     }
 
     final session = WorkoutSession(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id: widget.initialSession?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
       type: _selectedType!,
       sets: sets,
       reps: reps,
-      loggedAt: DateTime.now(),
+      loggedAt: widget.initialSession?.loggedAt ?? DateTime.now(),
     );
 
     Navigator.pop(context, session);
@@ -46,7 +61,7 @@ class _AddSessionScreenState extends State<AddSessionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Session')),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Session' : 'Add Session')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

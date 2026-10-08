@@ -7,6 +7,7 @@ import 'screens/workouts_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/profile_screen.dart';
 import 'widgets/app_header.dart';
+import 'widgets/glass_nav_bar.dart';
 
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
@@ -37,6 +38,18 @@ class _RootShellState extends State<RootShell> {
     await _repository.saveSessions(_sessions);
   }
 
+  Future<void> _updateSession(WorkoutSession updated) async {
+    setState(() {
+      _sessions = [for (final s in _sessions) s.id == updated.id ? updated : s];
+    });
+    await _repository.saveSessions(_sessions);
+  }
+
+  Future<void> _deleteSession(WorkoutSession session) async {
+    setState(() => _sessions = _sessions.where((s) => s.id != session.id).toList());
+    await _repository.saveSessions(_sessions);
+  }
+
   void _onTabTapped(int index) {
     setState(() => _currentIndex = index);
   }
@@ -45,49 +58,38 @@ class _RootShellState extends State<RootShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppHeader(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        width: 64,
-        height: 64,
-        child: FloatingActionButton(
-          onPressed: () async {
-            final result = await Navigator.push<WorkoutSession>(
-              context,
-              MaterialPageRoute(builder: (_) => const LoggingChoiceScreen()),
-            );
-            if (result != null) {
-              await _addSession(result);
-              setState(() => _currentIndex = 2); // jump to History tab so the new entry is visible
-            }
-          },
-          backgroundColor: const Color(0xFFF5A623),
-          foregroundColor: Colors.white,
-          elevation: 4,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add, size: 30),
-        ),
-      ),
+      extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
         children: [
           const HomeScreen(),
           const WorkoutsScreen(),
-          HistoryScreen(sessions: _sessions),
+          HistoryScreen(
+            sessions: _sessions,
+            onEdit: _updateSession,
+            onDelete: _deleteSession,
+          ),
           const ProfileScreen(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: GlassNavBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
-        backgroundColor: const Color(0xFF121218),
-        selectedItemColor: Colors.redAccent,
-        unselectedItemColor: Colors.white38,
-        type: BottomNavigationBarType.fixed,
+        onCenterTap: () async {
+          final result = await Navigator.push<WorkoutSession>(
+            context,
+            MaterialPageRoute(builder: (_) => const LoggingChoiceScreen()),
+          );
+          if (result != null) {
+            await _addSession(result);
+            setState(() => _currentIndex = 2); // jump to History tab so the new entry is visible
+          }
+        },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Workouts'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          GlassNavItem(Icons.home_rounded, 'Home'),
+          GlassNavItem(Icons.fitness_center_rounded, 'Workouts'),
+          GlassNavItem(Icons.history_rounded, 'History'),
+          GlassNavItem(Icons.person_rounded, 'Profile'),
         ],
       ),
     );

@@ -5,11 +5,16 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Home',
-        style: TextStyle(color: Colors.white70, fontSize: 20),
-      ),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Center(
+          child: Text(
+            'Home',
+            style: TextStyle(color: Colors.white70, fontSize: 20),
+          ),
+        ),
+      ],
     );
   }
 }
