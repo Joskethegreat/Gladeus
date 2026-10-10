@@ -40,18 +40,27 @@ class _AddSessionScreenState extends State<AddSessionScreen> {
     final sets = int.tryParse(_setsController.text);
     final reps = int.tryParse(_repsController.text);
 
-    if (_selectedType == null || sets == null || sets <= 0 || reps == null || reps <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pick a type and enter sets/reps greater than 0.')),
-      );
+    String? error;
+    if (_selectedType == null) {
+      error = 'Pick a workout type.';
+    } else if (sets == null || sets <= 0) {
+      error = 'Sets must be at least 1.';
+    } else if (reps == null || reps <= 0) {
+      error = 'Reps must be at least 1.';
+    }
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
       return;
     }
+    // Both are non-null and positive past this point.
+    final validSets = sets!;
+    final validReps = reps!;
 
     final session = WorkoutSession(
       id: widget.initialSession?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
       type: _selectedType!,
-      sets: sets,
-      reps: reps,
+      sets: validSets,
+      reps: validReps,
       loggedAt: widget.initialSession?.loggedAt ?? DateTime.now(),
     );
 

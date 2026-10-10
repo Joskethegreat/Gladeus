@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 /// Frosted glass surface: blur, soft tint, thin border and a bright top edge.
 class GlassCard extends StatefulWidget {
@@ -27,6 +28,7 @@ class _GlassCardState extends State<GlassCard> {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(widget.radius);
+    final c = context.colors;
     return Listener(
       // Feedback on press, not release.
       onPointerDown: (_) => setState(() => _pressed = widget.onTap != null),
@@ -41,8 +43,8 @@ class _GlassCardState extends State<GlassCard> {
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: radius,
-              boxShadow: const [
-                BoxShadow(color: Color(0x55000000), blurRadius: 24, offset: Offset(0, 10)),
+              boxShadow: [
+                BoxShadow(color: c.glassShadow, blurRadius: 24, offset: const Offset(0, 10)),
               ],
             ),
             child: ClipRRect(
@@ -56,12 +58,9 @@ class _GlassCardState extends State<GlassCard> {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.10),
-                        Colors.white.withValues(alpha: 0.03),
-                      ],
+                      colors: [c.glassTop, c.glassBottom],
                     ),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.18), width: 1),
+                    border: Border.all(color: c.glassBorder, width: 1),
                   ),
                   child: widget.child,
                 ),

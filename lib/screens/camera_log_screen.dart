@@ -9,8 +9,14 @@ import '../pose/movenet_pose_detector.dart';
 import '../pose/pose_debug_widgets.dart';
 import '../pose/pose_worker.dart';
 import '../pose/rep_counter.dart';
+import '../theme/app_colors.dart';
+import '../widgets/friendly_dialog.dart';
+import '../widgets/slide_to_stop.dart';
 
 enum _Stage { setup, tracking, summary }
+
+const _minReps = 1;
+const _accent = Color(0xFFF5A623);
 
 class CameraLogScreen extends StatefulWidget {
   const CameraLogScreen({super.key});
@@ -217,12 +223,24 @@ class _CameraLogScreenState extends State<CameraLogScreen> {
     if (mounted) setState(() => _stage = _Stage.summary);
   }
 
+  void _explainCannotSave() {
+    showFriendlyDialog(
+      context,
+      title: 'No reps counted',
+      message: "We didn't spot any reps this time, so there's nothing to save. "
+          'Make sure your whole body is in view, then give it another go!',
+    );
+  }
+
   void _onSavePressed() {
+    final reps = _repCounter?.reps ?? 0;
+    if (reps < _minReps) return; // never log a session with zero reps
+
     final session = WorkoutSession(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       type: _selectedType!,
       sets: 1,
-      reps: _repCounter?.reps ?? 0,
+      reps: reps,
       loggedAt: DateTime.now(),
     );
     Navigator.pop(context, session);
@@ -408,18 +426,9 @@ class _CameraLogScreenState extends State<CameraLogScreen> {
           ),
           Positioned(
             bottom: 48,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: _onStopPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
-                child: const Text('Stop', style: TextStyle(fontSize: 18)),
-              ),
-            ),
+            left: 24,
+            right: 24,
+            child: SlideToStop(onComplete: _onStopPressed),
           ),
         ],
       ),
@@ -427,47 +436,83 @@ class _CameraLogScreenState extends State<CameraLogScreen> {
   }
 
   Widget _buildSummary() {
+    final c = context.colors;
     final reps = _repCounter?.reps ?? 0;
+    final canSave = reps >= _minReps;
+    final noun = _selectedType!.label.toLowerCase();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Session Summary')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.fitness_center, size: 64, color: Colors.white54),
-            const SizedBox(height: 16),
-            Text(
-              _selectedType!.label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '$reps reps · 1 set',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _onCancelPressed,
-                    child: const Text('Cancel'),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        canSave ? 'Amazing!' : 'No reps counted',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: c.text,
+                          fontSize: 34,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.8,
+                          height: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '$reps',
+                        style: TextStyle(
+                          color: c.text,
+                          fontSize: 120,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -4,
+                          height: 1.05,
+                          fontFeatures: const [ui.FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      Text(
+                        'reps of ${noun}s',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: c.textSecondary, fontSize: 20, letterSpacing: -0.2),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _onSavePressed,
-                    child: const Text('Save'),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  // Stays tappable when unavailable so it can explain why.
+                  onPressed: canSave ? _onSavePressed : _explainCannotSave,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: canSave ? _accent : c.divider,
+                    foregroundColor: canSave ? Colors.black87 : c.textTertiary,
+                    minimumSize: const Size.fromHeight(54),
+                    shape: const StadiumBorder(),
+                    textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                   ),
+                  child: const Text('Save'),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: _onCancelPressed,
+                style: TextButton.styleFrom(
+                  foregroundColor: c.textTertiary,
+                  minimumSize: const Size.fromHeight(48),
+                ),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(fontSize: 16, decoration: TextDecoration.underline),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

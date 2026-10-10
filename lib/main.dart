@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'root_shell.dart';
+import 'theme/app_colors.dart';
+import 'theme/theme_controller.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ThemeController.load(); // so the first frame already uses the saved theme
   runApp(const GladeusApp());
+}
+
+ThemeData _buildTheme(Brightness brightness) {
+  final colors = brightness == Brightness.dark ? AppColors.dark : AppColors.light;
+  final base = ThemeData(
+    brightness: brightness,
+    scaffoldBackgroundColor: colors.background,
+    colorSchemeSeed: Colors.tealAccent,
+    useMaterial3: true,
+    extensions: [colors],
+  );
+  // Inter: closest match to Apple's SF system font.
+  return base.copyWith(
+    textTheme: GoogleFonts.interTextTheme(base.textTheme),
+    primaryTextTheme: GoogleFonts.interTextTheme(base.primaryTextTheme),
+  );
 }
 
 class GladeusApp extends StatelessWidget {
@@ -11,23 +31,16 @@ class GladeusApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Gladeus',
-      debugShowCheckedModeBanner: false,
-      theme: () {
-        final base = ThemeData(
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: const Color(0xFF0B0B0F),
-          colorSchemeSeed: Colors.tealAccent,
-          useMaterial3: true,
-        );
-        // Inter: closest match to Apple's SF system font.
-        return base.copyWith(
-          textTheme: GoogleFonts.interTextTheme(base.textTheme),
-          primaryTextTheme: GoogleFonts.interTextTheme(base.primaryTextTheme),
-        );
-      }(),
-      home: const RootShell(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.mode,
+      builder: (context, mode, _) => MaterialApp(
+        title: 'Gladeus',
+        debugShowCheckedModeBanner: false,
+        theme: _buildTheme(Brightness.light),
+        darkTheme: _buildTheme(Brightness.dark),
+        themeMode: mode,
+        home: const RootShell(),
+      ),
     );
   }
 }

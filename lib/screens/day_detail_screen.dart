@@ -4,6 +4,7 @@ import '../models/workout_session.dart';
 import '../widgets/glass_card.dart';
 import 'add_session_screen.dart';
 import 'history_screen.dart';
+import '../theme/app_colors.dart';
 
 class DayDetailScreen extends StatefulWidget {
   final DateTime day;
@@ -69,6 +70,7 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.colors;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -89,8 +91,8 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
                     children: [
                       Text(
                         s.type.label,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: c.text,
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
@@ -98,18 +100,18 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
                       const SizedBox(height: 6),
                       Text(
                         '${s.sets} sets × ${s.reps} reps',
-                        style: const TextStyle(color: Colors.white70, fontSize: 15),
+                        style: TextStyle(color: c.textSecondary, fontSize: 15),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         'Logged at ${_time(s.loggedAt)}',
-                        style: const TextStyle(color: Colors.white38, fontSize: 13),
+                        style: TextStyle(color: c.textTertiary, fontSize: 13),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit_rounded, color: Colors.white70),
+                  icon: Icon(Icons.edit_rounded, color: c.textSecondary),
                   tooltip: 'Edit',
                   onPressed: () => _edit(s),
                 ),

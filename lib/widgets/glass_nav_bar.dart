@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import '../theme/app_colors.dart';
 
 class GlassNavItem {
   final IconData icon;
@@ -107,10 +108,11 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
 
   Widget _glassPill(double slotW, bool reduceMotion) {
     const radius = BorderRadius.all(Radius.circular(36));
+    final c = context.colors;
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: [BoxShadow(color: Color(0x66000000), blurRadius: 30, offset: Offset(0, 12))],
+        boxShadow: [BoxShadow(color: c.glassShadow, blurRadius: 30, offset: const Offset(0, 12))],
       ),
       child: ClipRRect(
         borderRadius: radius,
@@ -132,12 +134,9 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: 0.16),
-                  Colors.white.withValues(alpha: 0.04),
-                ],
+                colors: [c.glassTop, c.glassBottom],
               ),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1),
+              border: Border.all(color: c.glassBorder, width: 1),
             ),
             child: Stack(
               children: [
@@ -150,9 +149,9 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(colors: [
-                        Colors.white.withValues(alpha: 0),
-                        Colors.white.withValues(alpha: 0.7),
-                        Colors.white.withValues(alpha: 0),
+                        c.glassRim.withValues(alpha: 0),
+                        c.glassRim,
+                        c.glassRim.withValues(alpha: 0),
                       ]),
                     ),
                   ),
@@ -198,20 +197,18 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
   }
 
   Widget _lens() {
+    final c = context.colors;
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.white.withValues(alpha: 0.26),
-            Colors.white.withValues(alpha: 0.08),
-          ],
+          colors: [c.lensTop, c.lensBottom],
         ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1),
+        border: Border.all(color: c.lensBorder, width: 1),
         boxShadow: [
-          BoxShadow(color: Colors.white.withValues(alpha: 0.08), blurRadius: 12, spreadRadius: -2),
+          BoxShadow(color: c.lensGlow, blurRadius: 12, spreadRadius: -2),
         ],
       ),
     );
@@ -220,6 +217,7 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
   Widget _tab(int index) {
     final item = widget.items[index];
     final selected = index == widget.currentIndex;
+    final c = context.colors;
     return Listener(
       // Respond on pointer-down, not release.
       behavior: HitTestBehavior.opaque,
@@ -234,7 +232,7 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
               scale: selected ? 1.08 : 1.0,
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeOutBack,
-              child: Icon(item.icon, size: 24, color: selected ? Colors.white : Colors.white60),
+              child: Icon(item.icon, size: 24, color: selected ? c.text : c.textTertiary),
             ),
             const SizedBox(height: 3),
             Text(
@@ -244,7 +242,7 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
                 fontSize: 10.5,
                 letterSpacing: 0.2,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                color: selected ? Colors.white : Colors.white60,
+                color: selected ? c.text : c.textTertiary,
               ),
             ),
           ],
@@ -279,7 +277,7 @@ class _GlassNavBarState extends State<GlassNavBar> with SingleTickerProviderStat
                 BoxShadow(color: _accent.withValues(alpha: 0.45), blurRadius: 24, offset: const Offset(0, 6)),
               ],
             ),
-            child: const Icon(Icons.add, size: 32, color: Colors.black87),
+            child: const Icon(Icons.photo_camera_rounded, size: 30, color: Colors.black87),
           ),
         ),
       ),

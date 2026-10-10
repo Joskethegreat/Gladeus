@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/workout_session.dart';
 import '../widgets/glass_card.dart';
 import 'day_detail_screen.dart';
+import '../theme/app_colors.dart';
 
 const _months = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -38,18 +39,41 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (sessions.isEmpty) {
-      return const Center(
-        child: Text(
-          'No sessions yet',
-          style: TextStyle(color: Colors.white70, fontSize: 20),
+    final c = context.colors;
+    final groups = _groupByDay().entries.toList();
+
+    final heading = Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 16, 0),
+      child: Text(
+        'My Workouts',
+        style: TextStyle(
+          color: c.text,
+          fontSize: 34,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.8,
+          height: 1.1,
         ),
+      ),
+    );
+
+    if (sessions.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          heading,
+          Expanded(
+            child: Center(
+              child: Text(
+                'No sessions yet',
+                style: TextStyle(color: c.textSecondary, fontSize: 20),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
-    final groups = _groupByDay().entries.toList();
-
-    return ListView.separated(
+    final list = ListView.separated(
       // Bottom padding keeps the last card clear of the floating nav bar.
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
       itemCount: groups.length,
@@ -77,15 +101,15 @@ class HistoryScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       formatDay(day),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: c.text,
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                         letterSpacing: -0.2,
                       ),
                     ),
                   ),
-                  const Icon(Icons.chevron_right_rounded, color: Colors.white54),
+                  Icon(Icons.chevron_right_rounded, color: c.textTertiary),
                 ],
               ),
               const SizedBox(height: 14),
@@ -94,13 +118,18 @@ class HistoryScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 6, bottom: 8),
                   child: Text(
                     describeSession(s),
-                    style: const TextStyle(color: Colors.white70, fontSize: 15),
+                    style: TextStyle(color: c.textSecondary, fontSize: 15),
                   ),
                 ),
             ],
           ),
         );
       },
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [heading, Expanded(child: list)],
     );
   }
 }

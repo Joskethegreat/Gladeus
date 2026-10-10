@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'data/profile_repository.dart';
 import 'data/workout_repository.dart';
+import 'models/user_profile.dart';
 import 'models/workout_session.dart';
 import 'screens/home_screen.dart';
 import 'screens/logging_choice_screen.dart';
@@ -22,10 +24,24 @@ class _RootShellState extends State<RootShell> {
   final WorkoutRepository _repository = WorkoutRepository();
   List<WorkoutSession> _sessions = [];
 
+  final ProfileRepository _profileRepository = ProfileRepository();
+  UserProfile _profile = const UserProfile();
+
   @override
   void initState() {
     super.initState();
     _loadSessions();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final loaded = await _profileRepository.loadProfile();
+    if (mounted) setState(() => _profile = loaded);
+  }
+
+  Future<void> _saveProfile(UserProfile profile) async {
+    setState(() => _profile = profile);
+    await _profileRepository.saveProfile(profile);
   }
 
   Future<void> _loadSessions() async {
@@ -57,7 +73,7 @@ class _RootShellState extends State<RootShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppHeader(),
+      appBar: AppHeader(name: _profile.name),
       extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
@@ -69,7 +85,7 @@ class _RootShellState extends State<RootShell> {
             onEdit: _updateSession,
             onDelete: _deleteSession,
           ),
-          const ProfileScreen(),
+          ProfileScreen(profile: _profile, onSave: _saveProfile),
         ],
       ),
       bottomNavigationBar: GlassNavBar(
