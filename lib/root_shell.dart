@@ -46,7 +46,7 @@ class _RootShellState extends State<RootShell> {
 
   Future<void> _loadSessions() async {
     final loaded = await _repository.loadSessions();
-    setState(() => _sessions = loaded);
+    if (mounted) setState(() => _sessions = loaded);
   }
 
   Future<void> _addSession(WorkoutSession session) async {
@@ -73,7 +73,7 @@ class _RootShellState extends State<RootShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppHeader(name: _profile.name),
+      appBar: const AppHeader(),
       extendBody: true,
       body: IndexedStack(
         index: _currentIndex,

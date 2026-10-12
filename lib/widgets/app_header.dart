@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
-  final String name;
-
-  const AppHeader({super.key, this.name = ''});
+  const AppHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,15 +17,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
               backgroundColor: c.divider,
               child: Icon(Icons.person, color: c.textTertiary),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                name.isEmpty ? 'Welcome back' : 'Welcome back, $name',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: c.textSecondary, fontSize: 16),
-              ),
-            ),
+            const Spacer(),
             IconButton(
               icon: Icon(Icons.notifications_none, color: c.textTertiary),
               onPressed: () {},

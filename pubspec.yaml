@@ -41,6 +41,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   google_fonts: ^8.2.1
+  supabase_flutter: ^2.18.2
+  flutter_dotenv: ^6.0.1
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +70,7 @@ flutter:
   assets:
     - assets/models/movenet_lightning.tflite
     - assets/images/
+    - .env
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

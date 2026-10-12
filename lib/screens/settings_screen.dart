@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/user_data_cache.dart';
+import '../services/auth_service.dart';
+import '../services/supabase_service.dart';
 import '../widgets/option_sheet.dart';
 import '../widgets/outline_link_button.dart';
 import '../theme/app_colors.dart';
@@ -98,8 +101,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 12),
           ],
+          if (SupabaseService.isConnected) ...[
+            const SizedBox(height: 12),
+            OutlineLinkButton(
+              label: 'Log out',
+              icon: Icons.logout_rounded,
+              onPressed: _logOut,
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  Future<void> _logOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Log out?'),
+        content: const Text('You will need to sign in again to see your workouts.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Log out')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final navigator = Navigator.of(context);
+    await UserDataCache.clear(); // don't leave this user's data for the next one
+    await AuthService.signOut();
+    // AuthGate switches to the login screen; close Settings so it isn't left on top.
+    navigator.popUntil((route) => route.isFirst);
   }
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'root_shell.dart';
+import 'services/supabase_service.dart';
 import 'theme/app_colors.dart';
 import 'theme/theme_controller.dart';
+import 'widgets/auth_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseService.init();
   await ThemeController.load(); // so the first frame already uses the saved theme
   runApp(const GladeusApp());
 }
@@ -39,7 +41,7 @@ class GladeusApp extends StatelessWidget {
         theme: _buildTheme(Brightness.light),
         darkTheme: _buildTheme(Brightness.dark),
         themeMode: mode,
-        home: const RootShell(),
+        home: const AuthGate(),
       ),
     );
   }
